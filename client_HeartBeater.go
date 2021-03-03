@@ -26,11 +26,11 @@ func init() {
 				} else if str, err := hst.NewStream(context.Background(), id, "Ping"); err != nil {
 					logger.Println("[NewStream]:", err)
 				} else if n, err := str.Write([]byte("ping")); err != nil {
-					log.Println("[WriteStream]", err, "{<n>}:", n)
+					logger.Println("[WriteStream]:", err, "{<n>}:", n)
 					str.Close()
 				} else {
 					if cfg.PrintLog {
-						logger.Println("[PING]:", id)
+						logger.Println("[Ping]:", id)
 					}
 					str.Close()
 				}

@@ -17,6 +17,7 @@ func init() {
 		logger *log.Logger,
 	) func(str network.Stream) {
 		return func(str network.Stream) {
+			// TODO: ADD ID AUTH HERE
 			if conn, err := net.Dial("tcp", cfg.Target); err != nil {
 				logger.Println("[DIAL]:", err)
 				str.Reset()

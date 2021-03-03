@@ -25,7 +25,7 @@ func main() {
 	); err != nil {
 		log.Fatalln("[P2P]:", err)
 	} else {
-		log.Println("[HOSTID]:", hst.ID())
+		log.Println("[HostID]:", hst.ID())
 
 		for k, v := range cfg.PEERS {
 			if id, err := peer.IDB58Decode(k); err != nil {
