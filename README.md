@@ -14,31 +14,20 @@ TODO
     "PEERS": {
         "<IDS OF PEERS>": "<ADDRESSES OF PEERS>",
     },
-    "PROTOCOLS": [
-        {
-            "ID": "Ping",
-            "CONFIG": {
-                "PrintLog": true
-            }
-        },
-        {
-            "ID": "None",
-            "CONFIG": {}
-        }
-    ],
+    "PROTOCOLS": [],
     "CLIENTS": [
         {
-            "id": "HeartBeater",
+            "id": "Pinger",
             "config": {
                 "TimeInterval": 1000000000,
                 "Target": "<ID OF TARGET>",
-                "PrintLog": true
+                "PrintRTT": true
             }
         },
         {
             "id": "TCPListener",
             "config": {
-                "Target": "<ID OF TARGET>",
+                "Targets": {"<ID OF TARGET>": 0},
                 "ListenAddress": "127.0.0.1:1080",
                 "PrintLog": true
             }
