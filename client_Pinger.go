@@ -7,14 +7,15 @@ import (
 
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/p2p/protocol/ping"
 )
 
 func init() {
-	clients["HeartBeater"] = func(
+	clients["Pinger"] = func(
 		cfg struct {
 			TimeInterval time.Duration
 			Target       string
-			PrintLog     bool
+			PrintRTT     bool
 		},
 		logger *log.Logger,
 	) func(hst host.Host) {
@@ -23,16 +24,10 @@ func init() {
 				time.Sleep(cfg.TimeInterval)
 				if id, err := peer.IDB58Decode(cfg.Target); err != nil {
 					logger.Println("[IDDecode]:", err)
-				} else if str, err := hst.NewStream(context.Background(), id, "Ping"); err != nil {
-					logger.Println("[NewStream]:", err)
-				} else if n, err := str.Write([]byte("ping")); err != nil {
-					logger.Println("[WriteStream]:", err, "{<n>}:", n)
-					str.Close()
-				} else {
-					if cfg.PrintLog {
-						logger.Println("[Ping]:", id)
-					}
-					str.Close()
+				} else if result := <-ping.Ping(context.Background(), hst, id); result.Error != nil {
+					logger.Println("[Ping]:", result.Error)
+				} else if cfg.PrintRTT {
+					logger.Println("[RTT]:", id, ":", result.RTT)
 				}
 			}
 		}

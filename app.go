@@ -34,12 +34,6 @@ func main() {
 				continue
 			} else {
 				hst.Peerstore().AddAddr(id, addr, peerstore.PermanentAddrTTL)
-				if err := hst.Connect(context.Background(), peer.AddrInfo{
-					ID:    id,
-					Addrs: []multiaddr.Multiaddr{addr},
-				}); err != nil {
-					log.Println("[PeerConnectionFail]:", id)
-				}
 				log.Println("[Peer]:", id)
 			}
 		}

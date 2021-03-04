@@ -37,17 +37,17 @@ func init() {
 							defer conn.Close()
 							defer str.Close()
 							if n, err := io.Copy(conn, str); err != nil {
-								logger.Println("[OUT]:", err)
+								logger.Println("[Stream -> Conn]:", err, "{<n>}:", n)
 							} else if cfg.PrintLog {
-								logger.Println("[WriteOUT]:", n)
+								logger.Println("[Stream -> Conn]:", n)
 							}
 						}()
 						go func() {
 							defer str.CloseWrite()
 							if n, err := io.Copy(str, conn); err != nil {
-								logger.Println("[IN]:", err)
+								logger.Println("[Conn -> Stream]:", err, "{<n>}:", n)
 							} else if cfg.PrintLog {
-								logger.Println("[WriteIN]:", n)
+								logger.Println("[Conn -> Stream]:", n)
 							}
 						}()
 					}
