@@ -7,13 +7,12 @@ import (
 	"net"
 
 	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/peer"
 )
 
 func init() {
 	clients["TCPListener"] = func(
 		cfg struct {
-			Target        string
+			Targets       libTargetSelector
 			ListenAddress string
 			PrintLog      bool
 		},
@@ -22,17 +21,16 @@ func init() {
 		return func(hst host.Host) {
 			if listener, err := net.Listen("tcp", cfg.ListenAddress); err != nil {
 				logger.Println("[Listen]:", err)
-			} else if id, err := peer.IDB58Decode(cfg.Target); err != nil {
-				logger.Println("[IDDecode]:", err)
 			} else {
 				defer listener.Close()
 				for {
 					if conn, err := listener.Accept(); err != nil {
 						logger.Println("[Accept]:", err)
-					} else if str, err := hst.NewStream(context.Background(), id, "TCPRedirect"); err != nil {
+					} else if str, err := hst.NewStream(context.Background(), cfg.Targets.Select(), "TCPRedirect"); err != nil {
 						logger.Println("[NewStream]:", err)
 						conn.Close()
 					} else {
+						// TODO: UPDATE TARGET WEIGHT BY ITS PERFORMANCE
 						go func() {
 							defer conn.Close()
 							defer str.Close()
