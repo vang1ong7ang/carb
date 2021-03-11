@@ -3,6 +3,7 @@ package hdl
 import (
 	"carb/hdl/commander"
 	"carb/hdl/forwardtcp"
+	"carb/hdl/listentcp"
 	"carb/hdl/peerlog"
 	"carb/hdl/pinger"
 	"encoding/json"
@@ -37,9 +38,18 @@ func (me *T) Init() {
 		peerlog.T{
 			TimeInterval: time.Minute,
 		},
+		listentcp.T{
+			Listen:      "127.0.0.1:1080",
+			IdleTimeout: 10 * time.Second,
+		},
 	} {
 		me.data[protocol.ID(path.Base(reflect.TypeOf(v).PkgPath()))] = v
 	}
+}
+
+// GetConfig ...
+func (me *T) GetConfig(id protocol.ID) (raw json.RawMessage, err error) {
+	return json.MarshalIndent(me.data[id], "", "    ")
 }
 
 // Get ...

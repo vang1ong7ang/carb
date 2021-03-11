@@ -27,7 +27,7 @@ type T struct {
 	RELAYMODE []relay.RelayOpt
 	PEERS     []struct {
 		ID      peer.ID
-		ADDRESS address.T
+		ADDRESS *address.T
 	}
 	Handlers []struct {
 		ENABLE bool
@@ -59,7 +59,7 @@ func (me *T) Start() {
 	}
 
 	for _, v := range me.PEERS {
-		hst.Peerstore().AddAddr(v.ID, &v.ADDRESS, peerstore.AddressTTL)
+		hst.Peerstore().AddAddr(v.ID, v.ADDRESS, peerstore.AddressTTL)
 	}
 
 	hdlmgt.Init()
