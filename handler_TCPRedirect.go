@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/libp2p/go-libp2p-core/network"
@@ -30,21 +31,31 @@ func init() {
 				logger.Println("[DIAL]:", err)
 				str.Reset()
 			} else {
+				con := &libConnDeadlineRefresher{conn, cfg.Idle}
+				con.Refresh()
+				var wg sync.WaitGroup
+				wg.Add(2)
+				defer con.Close()
+				defer str.Close()
+				defer wg.Wait()
+
 				go func() {
-					reader := io.TeeReader(str, libConnDeadlineRefresher{conn, cfg.Idle})
-					if n, err := io.Copy(conn, reader); err != nil {
-						logger.Println("[Stream -> Conn]:", err, "{<n>}:", n)
+					defer wg.Done()
+					defer str.CloseRead()
+					if n, err := io.Copy(con, str); err != nil {
+						logger.Println("[Str -> Con]:", err, "{<n>}:", n)
 					} else if cfg.PrintLog {
-						logger.Println("[Stream -> Conn]:", n)
+						logger.Println("[Str -> Con]:", n)
 					}
 				}()
+
 				go func() {
-					defer conn.Close()
-					defer str.Close()
-					if n, err := io.Copy(str, conn); err != nil {
-						logger.Println("[Conn -> Stream]:", err, "{<n>}:", n)
+					defer wg.Done()
+					defer str.CloseWrite()
+					if n, err := io.Copy(str, con); err != nil {
+						logger.Println("[Con -> Str]:", err, "{<n>}:", n)
 					} else if cfg.PrintLog {
-						logger.Println("[Conn -> Stream]:", n)
+						logger.Println("[Con -> Str]:", n)
 					}
 				}()
 			}

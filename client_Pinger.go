@@ -14,7 +14,7 @@ func init() {
 	clients["Pinger"] = func(
 		cfg struct {
 			TimeInterval time.Duration
-			Target       string
+			Target       peer.ID
 			PrintRTT     bool
 		},
 		logger *log.Logger,
@@ -22,12 +22,10 @@ func init() {
 		return func(hst host.Host) {
 			for {
 				time.Sleep(cfg.TimeInterval)
-				if id, err := peer.IDB58Decode(cfg.Target); err != nil {
-					logger.Println("[IDDecode]:", err)
-				} else if result := <-ping.Ping(context.Background(), hst, id); result.Error != nil {
+				if result := <-ping.Ping(context.Background(), hst, cfg.Target); result.Error != nil {
 					logger.Println("[Ping]:", result.Error)
 				} else if cfg.PrintRTT {
-					logger.Println("[RTT]:", id, ":", result.RTT)
+					logger.Println("[RTT]:", cfg.Target, ":", result.RTT)
 				}
 			}
 		}

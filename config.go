@@ -7,14 +7,18 @@ import (
 
 	relay "github.com/libp2p/go-libp2p-circuit"
 	"github.com/libp2p/go-libp2p-core/crypto"
+	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/protocol"
 )
 
 type config struct {
 	SK        string
-	LISTEN    string
+	LISTEN    []string
 	RELAYMODE []relay.RelayOpt
-	PEERS     map[string]string
+	PEERS     []struct {
+		ID      peer.ID
+		Address string
+	}
 	PROTOCOLS []struct {
 		ID     protocol.ID
 		CONFIG json.RawMessage
