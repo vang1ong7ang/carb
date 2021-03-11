@@ -1,6 +1,7 @@
 package main
 
 import (
+	"carb/lib/address"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -17,7 +18,12 @@ type config struct {
 	RELAYMODE []relay.RelayOpt
 	PEERS     []struct {
 		ID      peer.ID
-		Address string
+		Address address.T
+	}
+	Handlers []struct {
+		Enable bool
+		ID     protocol.ID
+		CONFIG json.RawMessage
 	}
 	PROTOCOLS []struct {
 		ID     protocol.ID

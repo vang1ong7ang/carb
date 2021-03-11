@@ -11,7 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/crypto"
 )
 
-func init() {
+func goneinit() {
 	cfg.parse()
 
 	cmd := flag.String("Command", "", "command")
