@@ -66,9 +66,9 @@ func (me *T) Init(hst host.Host, logger *log.Logger) {
 
 				defer wg.Done()
 				defer str.CloseRead()
-				defer logger.Println("[Str -> Con]:", n, "(err):", err)
 
 				n, err = io.Copy(&con, str)
+				logger.Println("[Str -> Con]:", n, "(err):", err)
 			}()
 
 			go func() {
@@ -77,9 +77,9 @@ func (me *T) Init(hst host.Host, logger *log.Logger) {
 
 				defer wg.Done()
 				defer str.CloseWrite()
-				defer logger.Println("[Con -> Str]:", n, "(err):", err)
 
 				n, err = io.Copy(str, &con)
+				logger.Println("[Con -> Str]:", n, "(err):", err)
 			}()
 
 		}()

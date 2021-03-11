@@ -9,6 +9,7 @@ type T struct {
 
 // Add ...
 func (me *T) Add(ids ...peer.ID) {
+	me.data = make(map[peer.ID]bool)
 	for _, v := range ids {
 		me.data[v] = true
 	}
