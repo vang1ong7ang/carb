@@ -20,19 +20,19 @@ import (
 
 // T ...
 type T struct {
-	SK        *sk.T
-	LISTEN    []string
-	RELAYMODE []relay.RelayOpt
-	PEERS     []struct {
-		ID      peer.ID
-		ADDRESS *address.T
-	}
-	Handlers []struct {
-		ENABLE   bool
-		LOGLEVEL int
-		ID       string
-		CONFIG   json.RawMessage
-	}
+	SK        *sk.T            `json:"sk"`
+	LISTEN    []string         `json:"listen"`
+	RELAYMODE []relay.RelayOpt `json:"relaymode"`
+	PEER      []struct {
+		ID      peer.ID    `json:"id"`
+		ADDRESS *address.T `json:"address"`
+	} `json:"peer"`
+	EXT []struct {
+		ENABLE   bool            `json:"enable"`
+		LOGLEVEL int             `json:"loglevel"`
+		ID       string          `json:"id"`
+		CONFIG   json.RawMessage `json:"config"`
+	} `json:"ext"`
 }
 
 // Start ...
@@ -55,14 +55,14 @@ func (me *T) Start() {
 		log.Fatalln(err)
 	}
 
-	for _, v := range me.PEERS {
+	for _, v := range me.PEER {
 		hst.Peerstore().AddAddr(v.ID, v.ADDRESS, peerstore.AddressTTL)
 	}
 
 	hdlmgt := new(ext.T)
 	hdlmgt.Init()
 
-	for _, v := range me.Handlers {
+	for _, v := range me.EXT {
 		if v.ENABLE == false {
 			continue
 		}
