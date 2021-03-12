@@ -1,8 +1,8 @@
 package pinger
 
 import (
+	"carb/lib/logger"
 	"context"
-	"log"
 	"time"
 
 	"github.com/libp2p/go-libp2p-core/host"
@@ -17,14 +17,14 @@ type T struct {
 }
 
 // Init ...
-func (me *T) Init(hst host.Host, logger *log.Logger) {
-	var result ping.Result
+func (me *T) Init(hst host.Host, log *logger.T) {
 	for {
 		time.Sleep(me.TimeInterval)
-		if result = <-ping.Ping(context.Background(), hst, me.Target); result.Error != nil {
-			logger.Println("[Error]:", result.Error)
+		result := <-ping.Ping(context.Background(), hst, me.Target)
+		if result.Error != nil {
+			log.Log(1, "fail", map[string]interface{}{"err": result.Error})
 			return
 		}
-		logger.Println("[Report]:", "(Target):", me.Target, "(RTT):", result.RTT)
+		log.Log(2, "ping", map[string]interface{}{"tgt": me.Target, "rtt": result.RTT})
 	}
 }

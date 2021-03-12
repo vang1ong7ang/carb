@@ -13,31 +13,49 @@ type T struct {
 }
 
 // Gen ...
-func (me *T) Gen() (err error) {
-	me.PrivKey, _, err = crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, rand.Reader)
-	return
+func (me *T) Gen() error {
+	sk, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, rand.Reader)
+
+	if err != nil {
+		return err
+	}
+
+	me.PrivKey = sk
+	return nil
 }
 
 // UnmarshalJSON ...
-func (me *T) UnmarshalJSON(p []byte) (err error) {
-	var str string
+func (me *T) UnmarshalJSON(p []byte) error {
+	str := new(string)
+	err := json.Unmarshal(p, str)
 
-	if err = json.Unmarshal(p, &str); err != nil {
-		return
+	if err != nil {
+		return err
 	}
 
-	if p, err = crypto.ConfigDecodeKey(str); err != nil {
-		return
+	dec, err := crypto.ConfigDecodeKey(*str)
+
+	if err != nil {
+		return err
 	}
 
-	me.PrivKey, err = crypto.UnmarshalPrivateKey(p)
-	return
+	sk, err := crypto.UnmarshalPrivateKey(dec)
+
+	if err != nil {
+		return err
+	}
+
+	me.PrivKey = sk
+	return nil
 }
 
 // MarshalJSON ...
-func (me T) MarshalJSON() (p []byte, err error) {
-	if p, err = crypto.MarshalPrivateKey(me.PrivKey); err != nil {
-		return
+func (me *T) MarshalJSON() ([]byte, error) {
+	enc, err := crypto.MarshalPrivateKey(me.PrivKey)
+
+	if err != nil {
+		return nil, err
 	}
-	return json.Marshal(crypto.ConfigEncodeKey(p))
+
+	return json.Marshal(crypto.ConfigEncodeKey(enc))
 }

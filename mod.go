@@ -2,12 +2,11 @@ package main
 
 import (
 	"carb/app"
-	"carb/hdl"
+	"carb/ext"
+	"carb/lib/sk"
 	"encoding/json"
 	"io/ioutil"
 	"log"
-
-	"github.com/libp2p/go-libp2p-core/protocol"
 )
 
 // T ...
@@ -37,6 +36,7 @@ func (me *T) Genconfig(args struct {
 	var app app.T
 	var conf []byte
 	var err error
+	app.SK = new(sk.T)
 	app.SK.Gen()
 	app.LISTEN = []string{"/ip4/0.0.0.0/tcp/5517", "/ip4/0.0.0.0/udp/5517/quic"}
 	if conf, err = json.MarshalIndent(app, "", "    "); err != nil {
@@ -47,13 +47,13 @@ func (me *T) Genconfig(args struct {
 	}
 }
 
-// Addhandler ...
-func (me *T) Addhandler(args struct {
+// Addext ...
+func (me *T) Addext(args struct {
 	Config string `default:".carb.json" help:"carb config file path"`
 	ID     string `default:"pinger" help:"handler protocol id"`
 }) {
 	var app app.T
-	var hdlmgt hdl.T
+	var hdlmgt ext.T
 	var conf []byte
 
 	var err error
@@ -66,18 +66,18 @@ func (me *T) Addhandler(args struct {
 	hdlmgt.Init()
 
 	var handler struct {
-		ENABLE bool
-		LOG    bool
-		ID     protocol.ID
-		CONFIG json.RawMessage
+		ENABLE   bool
+		LOGLEVEL int
+		ID       string
+		CONFIG   json.RawMessage
 	}
 
-	if handler.CONFIG, err = hdlmgt.GetConfig(protocol.ID(args.ID)); err != nil {
+	if handler.CONFIG, err = hdlmgt.GetConfig(args.ID); err != nil {
 		log.Fatalln(err)
 	}
 
 	handler.ENABLE = true
-	handler.ID = protocol.ID(args.ID)
+	handler.ID = args.ID
 	app.Handlers = append(app.Handlers, handler)
 
 	if conf, err = json.MarshalIndent(app, "", "    "); err != nil {

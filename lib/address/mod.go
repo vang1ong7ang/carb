@@ -12,13 +12,20 @@ type T struct {
 }
 
 // UnmarshalJSON ...
-func (me *T) UnmarshalJSON(p []byte) (err error) {
-	var str string
+func (me *T) UnmarshalJSON(p []byte) error {
+	str := new(string)
+	err := json.Unmarshal(p, &str)
 
-	if err = json.Unmarshal(p, &str); err != nil {
-		return
+	if err != nil {
+		return err
 	}
 
-	me.Multiaddr, err = multiaddr.NewMultiaddr(str)
-	return
+	addr, err := multiaddr.NewMultiaddr(*str)
+
+	if err != nil {
+		return err
+	}
+
+	me.Multiaddr = addr
+	return nil
 }
